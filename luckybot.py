@@ -20,6 +20,7 @@ import requests
 import itertools
 import time
 import json
+from proxywrap import GimmeProxyAPI
 
 
 # Enable logging.
@@ -40,13 +41,18 @@ def help_command(update, context):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Lista dei comandi supportati:\n\n/cerca: trova i migliori prodotti di Amazon consigliati da LuckyFlo.')
 
+# Setting proxy with a GimmeProxy wrapper.
+def refresh(update,context):
+    try:
+        proxy = GimmeProxyAPI(country="IT,UK")
+        print("Connected with IP: " + proxy.get_ip_port())
+    except Exception:
+        update.message.reply_text("I nostri server proxy non rispondono al momento :(")
+
 # /cerca command. The command makes an Amazon.it research using the passed keywords
 # and returns some links as of version 1.0.
 def search(update, context):
     """Search for Amazon product and return it. Need to issue /cerca keywords."""
-
-    proxy = GimmeProxyAPI(country="IT,UK")
-    print(proxy.get_ip_port())
 
     #Initial nullness check for keywords. If no keyword is passed it's not worth to perform the scrap.
     if (not context.args):
@@ -82,18 +88,19 @@ def search(update, context):
     #Setting response message.
     response = "Per la tua ricerca su" + suppkey + " ho trovato i seguenti link:\n ----------------------\n\n\n"
     #Adding links to the response. Product_url var contains the link of a single product and will be used to scrap product information.
-    for index, a in zip(range(5), links):
+    for index, a in zip(range(4), links):
         product_url = "https://amazon.it" + a['href']
-        #debug print# update.message.reply_text(product_url + " HO FATTO URL N*" + str(index+1))
+        '''debug print''' 
+        update.message.reply_text(product_url + " HO FATTO URL N*" + str(index+1))
         #Preparing the soup for single product scraping. (Price and name)
         s = requests.get(product_url, headers = headers)
         prodsoup = BeautifulSoup(s.content, "lxml")
         #debug print# update.message.reply_text("scrappato URL N*"+ str(index+1))
         price = prodsoup.find_all('span', {'class': 'a-size-medium a-color-price'})
         name = prodsoup.find_all('span', {'id': 'productTitle'})
-        
+        '''debug print''' 
+        update.message.reply_text(name[0].get_text() + " prezzo: " + price[0].get_text())
         response += "["+ str(index+1) + ". " + name[0].get_text() +"](" + product_url + ") " + "Prezzo: " + price[0].get_text() + "\n\n"
-    response = ""
     
     #Returned message.
     update.message.reply_text(response, link_preview=True)
@@ -116,6 +123,9 @@ def main():
 
     # on noncommand i.e cerca - search for Amazon results and return links.
     dp.add_handler(CommandHandler("cerca", search))
+
+    # on noncommand i.e refresh - change bot ip so it doesn't get banned
+    dp.add_handler(CommandHandler("refresh", refresh))
 
     # Start the Bot
     updater.start_polling()
