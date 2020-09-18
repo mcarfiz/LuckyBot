@@ -15,9 +15,11 @@ bot.
 
 import logging
 
-from telegram.ext import Updater, CommandHandler, MessageHandler #, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler
 from bs4 import BeautifulSoup
 import requests
+
+import itertools
 
 # Enable logging.
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -29,11 +31,11 @@ logger = logging.getLogger(__name__)
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
     """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi! Im ready to begin')
+    update.message.reply_text('Ciao bello! Scrivi /help per conoscere cosa posso fare!')
 
 def help_command(update, context):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
+    update.message.reply_text('Lista dei comandi supportati:\n\n/cerca: trova i migliori prodotti di Amazon consigliati da LuckyFlo.')
 
 # /cerca command. The command makes an Amazon.it research using the passed keywords
 # and returns some links as of version 1.0.
@@ -42,11 +44,14 @@ def search(update, context):
     #Initial nullness check for keywords. If no keyword is passed it's not worth to perform the scrap.
     if (not context.args):
         update.message.reply_text("Prova ad aggiungere qualche parola da cercare dopo il comando /cerca :)")
+        return
     
-    #Saving user-supplied keywords.
+    #Saving user-supplied keywords. Keyword var will be used for scraping (ence the + divisor), suppkey is meant to be printed.
     keyword = ""
+    suppkey = ""
     for word in context.args:
         keyword = keyword + "+" + word
+        suppkey += " " + word
 
     #Build Amazon search link.
     AMZN = "https://www.amazon.it/s?k="
@@ -61,13 +66,20 @@ def search(update, context):
     r = requests.get(url, headers = headers)
     soup = BeautifulSoup(r.content, "lxml")
 
-    #debug print
+    #Parse the right tags and save them into the links list.
     links = soup.find_all('a', {'class': 'a-link-normal s-no-outline'}, href=True)
-    for a in links:
-        print("Found the URL:", a['href'])
+
+    """for a in links:
+        print("Found the URL:", a['href'])"""
+    
+    #Setting response message.
+    response = "Per la tua ricerca su" + suppkey + " ho trovato i seguenti link:\n ----------------------\n\n\n"
+    #Adding links to the response.
+    for index, a in zip(range(5), links):
+        response += "[Risultato "+ str(index+1) + ".](amazon.it" + a['href'] + ")\n\n"
     
     #Returned message.
-    """update.message.reply_text(url, link_preview=True)"""
+    update.message.reply_text(response, link_preview=True)
 
 #Main function.
 def main():
