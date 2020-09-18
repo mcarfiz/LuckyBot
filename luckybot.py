@@ -79,7 +79,7 @@ def search(update, context):
     for index, a in zip(range(5), links):
         product_url = "https://amazon.it" + a['href']
         #debug print# update.message.reply_text(product_url + " HO FATTO URL N*" + str(index+1))
-        #Preparing the soup for single product scraping. (Price)
+        #Preparing the soup for single product scraping. (Price and name)
         s = requests.get(product_url, headers = headers)
         prodsoup = BeautifulSoup(s.content, "lxml")
         #debug print# update.message.reply_text("scrappato URL N*"+ str(index+1))
@@ -87,6 +87,7 @@ def search(update, context):
         name = prodsoup.find_all('span', {'id': 'productTitle'})
         
         response += "["+ str(index+1) + ". " + name[0].get_text() +"](" + product_url + ") " + "Prezzo: " + price[0].get_text() + "\n\n"
+    response = ""
     
     #Returned message.
     update.message.reply_text(response, link_preview=True)
