@@ -19,6 +19,8 @@ from bs4 import BeautifulSoup
 import requests
 import itertools
 import time
+import json
+
 
 # Enable logging.
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -42,6 +44,10 @@ def help_command(update, context):
 # and returns some links as of version 1.0.
 def search(update, context):
     """Search for Amazon product and return it. Need to issue /cerca keywords."""
+
+    proxy = GimmeProxyAPI(country="IT,UK")
+    print(proxy.get_ip_port())
+
     #Initial nullness check for keywords. If no keyword is passed it's not worth to perform the scrap.
     if (not context.args):
         update.message.reply_text("Prova ad aggiungere qualche parola da cercare dopo il comando /cerca :)")
@@ -91,6 +97,7 @@ def search(update, context):
     
     #Returned message.
     update.message.reply_text(response, link_preview=True)
+    
 
 #Main function.
 def main():
