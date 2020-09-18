@@ -14,12 +14,11 @@ bot.
 """
 
 import logging
-
 from telegram.ext import Updater, CommandHandler, MessageHandler
 from bs4 import BeautifulSoup
 import requests
-
 import itertools
+import time
 
 # Enable logging.
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -31,6 +30,8 @@ logger = logging.getLogger(__name__)
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
     """Send a message when the command /start is issued."""
+    update.message.reply_text('Attivazione di LuckyFloBot V. 0.2 \nUn secondo di pazienza, grazie.')
+    time.sleep(1.5)
     update.message.reply_text('Ciao bello! Scrivi /help per conoscere cosa posso fare!')
 
 def help_command(update, context):
@@ -45,7 +46,7 @@ def search(update, context):
     if (not context.args):
         update.message.reply_text("Prova ad aggiungere qualche parola da cercare dopo il comando /cerca :)")
         return
-    
+
     #Saving user-supplied keywords. Keyword var will be used for scraping (ence the + divisor), suppkey is meant to be printed.
     keyword = ""
     suppkey = ""
@@ -69,14 +70,23 @@ def search(update, context):
     #Parse the right tags and save them into the links list.
     links = soup.find_all('a', {'class': 'a-link-normal s-no-outline'}, href=True)
 
-    """for a in links:
-        print("Found the URL:", a['href'])"""
-    
+    #Just a confirmation for the user.
+    update.message.reply_text("La tua richiesta per \"" + suppkey + "\" è stata ricevuta. \nAttendi qualche secondo affinché venga processata.")
+
     #Setting response message.
     response = "Per la tua ricerca su" + suppkey + " ho trovato i seguenti link:\n ----------------------\n\n\n"
-    #Adding links to the response.
+    #Adding links to the response. Product_url var contains the link of a single product and will be used to scrap product information.
     for index, a in zip(range(5), links):
-        response += "[Risultato "+ str(index+1) + ".](amazon.it" + a['href'] + ")\n\n"
+        product_url = "https://amazon.it" + a['href']
+        #debug print# update.message.reply_text(product_url + " HO FATTO URL N*" + str(index+1))
+        #Preparing the soup for single product scraping. (Price)
+        s = requests.get(product_url, headers = headers)
+        prodsoup = BeautifulSoup(s.content, "lxml")
+        #debug print# update.message.reply_text("scrappato URL N*"+ str(index+1))
+        price = prodsoup.find_all('span', {'class': 'a-size-medium a-color-price'})
+        name = prodsoup.find_all('span', {'id': 'productTitle'})
+        
+        response += "["+ str(index+1) + ". " + name[0].get_text() +"](" + product_url + ") " + "Prezzo: " + price[0].get_text() + "\n\n"
     
     #Returned message.
     update.message.reply_text(response, link_preview=True)
