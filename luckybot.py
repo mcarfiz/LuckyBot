@@ -3,12 +3,12 @@
 # This program is dedicated to the public domain under the CC0 license.
 
 """
-Simple Bot to reply to Telegram messages.
+Simple Telegram Bot.
 First, a few handler functions are defined. Then, those functions are passed to
 the Dispatcher and registered at their respective places.
 Then, the bot is started and runs until we press Ctrl-C on the command line.
 Usage:
-/start, /help, /cerca
+/start, /help, /search, /refresh
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
@@ -49,7 +49,7 @@ def refresh(update,context):
     except Exception:
         update.message.reply_text("I nostri server proxy non rispondono al momento :(")
 
-# /cerca command. The command makes an Amazon.it research using the passed keywords
+# /search command. The command makes an Amazon.it research using the passed keywords
 # and returns some links as of version 1.0.
 def search(update, context):
     """Search for Amazon product and return it. Need to issue /cerca keywords."""
@@ -123,6 +123,7 @@ def main():
 
     # on noncommand i.e cerca - search for Amazon results and return links.
     dp.add_handler(CommandHandler("cerca", search))
+    dp.add_handler(CommandHandler("search", search))
 
     # on noncommand i.e refresh - change bot ip so it doesn't get banned
     dp.add_handler(CommandHandler("refresh", refresh))
