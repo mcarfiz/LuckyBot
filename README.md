@@ -9,6 +9,6 @@ Code documentation is in english anyway.
 
 ## Functions
 Current supported functions:
-÷ **/cerca** researches some keywords and return the first five results of an Amazon.it search.
+- **/cerca** researches some keywords and return the first five results of an Amazon.it search.
 
 **Project is open-source: still, since it contains our private token it will not be public from day one.**
