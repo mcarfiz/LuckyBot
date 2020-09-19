@@ -15,6 +15,7 @@ Current supported functions:
 - **/support** send a simple help message in case something is broken.
 - **/r** restart the application. Only for administrators (no support for private chats).
 - **/status** check target site availability (*e.g.* amazon.it)
+- **/refresh** change application IP, only for administrators. Don't spam this command or it will be blocked.
 
 
 ## What is needed to run the bot (Ubuntu/PIP)
