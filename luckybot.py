@@ -9,7 +9,7 @@ First, a few handler functions are defined. Then, those functions are passed to
 the Dispatcher and registered at their respective places.
 Then, the bot is started and runs until we press Ctrl-C on the command line.
 Commands list:
-/start, /help, /search, /refresh, /r
+/start, /help, /search, /refresh, /r, /support, /status
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 
@@ -29,6 +29,7 @@ from mwt import MWT
 import os
 import sys
 from threading import Thread
+import urllib.request
 
 REF_TAG_VALUE="&tag=luckyflo95-21"
 
@@ -50,6 +51,10 @@ def help_command(update, context):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Lista dei comandi supportati:\n\n/cerca: trova i migliori prodotti di Amazon consigliati da LuckyFlo.')
 
+def support_command(update, context):
+    """Send a message when the command /support is issued."""
+    update.message.reply_text('Ciao, se il bot non funziona correttamente contatta @sgabelloni o @LuckyFlo')
+
 # Setting proxy with a GimmeProxy wrapper.
 # This is a debug command and shouldn't be used by common users.
 def refresh(update,context):
@@ -64,19 +69,24 @@ def refresh(update,context):
 def search(update, context):
     """Search for Amazon product and return it. Need to issue /cerca keywords."""
 
-    #Initial nullness check for keywords. If no keyword is passed it's not worth to perform the scrap.
+    # Initial nullness check for keywords. If no keyword is passed it's not worth to perform the scrap.
     if (not context.args):
         update.message.reply_text("Prova ad aggiungere qualche parola da cercare dopo il comando /cerca :)")
         return
 
-    #Saving user-supplied keywords. Keyword var will be used for scraping (ence the + divisor), suppkey is meant to be printed.
+    # Check if target site is reachable.
+    if not check_net():
+        update.message.reply_text("Target site is not responding! Try /support to seek help.")
+        return
+
+    # Saving user-supplied keywords. Keyword var will be used for scraping (ence the + divisor), suppkey is meant to be printed.
     keyword = ""
     suppkey = ""
     for word in context.args:
         keyword = keyword + "+" + word
         suppkey += " " + word
 
-    #Build Amazon search link.
+    # Build Amazon search link.
     AMZN = "https://www.amazon.it/s?k="
     url = AMZN + keyword
     # Setting a header to trick Amazon. This way it will think that the scraper is a legit user.
@@ -84,34 +94,33 @@ def search(update, context):
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36'
     }
 
-    #Scrape the web page using bs4 and lxml parser.
+    # Scrape the web page using bs4 and lxml parser.
     r = requests.get(url, headers = headers)
     soup = BeautifulSoup(r.content, "lxml")
 
-    #Parse the right tags and save them into the links list.
+    # Parse the right tags and save them into the links list.
     links = soup.find_all('a', {'class': 'a-link-normal s-no-outline'}, href=True)
 
-    #Just a confirmation for the user.
+    # Just a confirmation for the user.
     update.message.reply_text("La tua richiesta per \"" + suppkey + "\" è stata ricevuta. \nAttendi qualche secondo affinché venga processata.")
 
-    #Setting response message.
+    # Setting response message.
     response = "Per la tua ricerca su" + suppkey + " ho trovato i seguenti link:\n ----------------------\n\n\n"
-    #Adding links to the response. Product_url var contains the link of a single product and will be used to scrap product information.
+    # Adding links to the response. Product_url var contains the link of a single product and will be used to scrap product information.
     for index, a in zip(range(4), links):
         product_url = "https://amazon.it" + a['href']
         '''debug print
         update.message.reply_text(product_url + " HO FATTO URL N*" + str(index+1))''' 
-        #Preparing the soup for single product scraping. (Price and name)
+        # Preparing the soup for single product scraping. (Price and name)
         s = requests.get(product_url, headers = headers)
         prodsoup = BeautifulSoup(s.content, "lxml")
-        #debug print# update.message.reply_text("scrappato URL N*"+ str(index+1))
         price = prodsoup.find_all('span', {'class': 'a-size-medium a-color-price'})
         name = prodsoup.find_all('span', {'id': 'productTitle'})
         '''debug print
         update.message.reply_text(name[0].get_text() + " prezzo: " + price[0].get_text())''' 
         response += "["+ str(index+1) + ". " + name[0].get_text().strip() +"](" + product_url + REF_TAG_VALUE + ") " + "Prezzo: " + price[0].get_text() + "\n\n"
     
-    #Returned message.
+    # Returned message.
     update.message.reply_text(response, link_preview=True)
 
 # Method for getting admin ids. Useful to allow the performing of specific commands.
@@ -119,9 +128,25 @@ def search(update, context):
 def get_admin_ids(bot, chat_id):
     """Returns a list of admin IDs for a given chat. Results are cached for 1 hour."""
     return [admin.user.id for admin in bot.get_chat_administrators(chat_id)]
-    
 
-#Main function.
+# Core of /status command. Checks if site is reachable or not.
+def check_net():
+    try:
+        urllib.request.urlopen('https://amazon.it', timeout=2)
+        return True
+    except urllib.request.URLError as err: 
+        return False    
+
+# /status command. The command pings target site and checks if server is reachable.
+def status(update, context):
+    if update.effective_user.id in get_admin_ids(context.bot, update.message.chat_id):
+        if check_net():
+            update.message.reply_text("Server DOES respond")
+        else:
+            update.message.reply_text("Server does NOT respond")
+
+
+# Main function.
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
@@ -155,8 +180,14 @@ def main():
     # on command i.e refresh - change bot ip so it doesn't get banned
     dp.add_handler(CommandHandler("refresh", refresh))
 
+    # on command i.e support - give some basic support help (like staff contacts)
+    dp.add_handler(CommandHandler("support", support_command))
+
     # on command i.e. r - restart the bot. Should only be performed by admins.
     dp.add_handler(CommandHandler('r', restart))
+
+    # on command i.e. r - check target site availability. Should only be performed by admins or internally.
+    dp.add_handler(CommandHandler('status', status))
 
     # Start the Bot
     updater.start_polling()
