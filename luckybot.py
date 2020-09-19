@@ -11,6 +11,9 @@ Usage:
 /start, /help, /search, /refresh
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
+
+$ref = 'luckyflo95-21';
+http://www.amazon.com/dp/ASIN/?&tag=luckyflo95-21
 """
 
 import logging
@@ -22,6 +25,7 @@ import time
 import json
 from proxywrap import GimmeProxyAPI
 
+REF_TAG_VALUE="&tag=luckyflo95-21"
 
 # Enable logging.
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -101,7 +105,7 @@ def search(update, context):
         name = prodsoup.find_all('span', {'id': 'productTitle'})
         '''debug print
         update.message.reply_text(name[0].get_text() + " prezzo: " + price[0].get_text())''' 
-        response += "["+ str(index+1) + ". " + name[0].get_text().strip() +"](" + product_url + ") " + "Prezzo: " + price[0].get_text() + "\n\n"
+        response += "["+ str(index+1) + ". " + name[0].get_text().strip() +"](" + product_url + REF_TAG_VALUE + ") " + "Prezzo: " + price[0].get_text() + "\n\n"
     
     #Returned message.
     update.message.reply_text(response, link_preview=True)
