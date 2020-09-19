@@ -1,5 +1,5 @@
 # LuckyFloBot
-Welcome to the LuckyFloBot repository.
+Welcome to the LuckyFloBot (codename CONNOR) repository.
 
 LuckyFloBot is Telegram bot written in Python 3.
 
