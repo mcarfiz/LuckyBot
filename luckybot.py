@@ -3,12 +3,13 @@
 # This program is dedicated to the public domain under the CC0 license.
 
 """
+Codename: CONNOR.
 Simple Telegram Bot.
 First, a few handler functions are defined. Then, those functions are passed to
 the Dispatcher and registered at their respective places.
 Then, the bot is started and runs until we press Ctrl-C on the command line.
-Usage:
-/start, /help, /search, /refresh
+Commands list:
+/start, /help, /search, /refresh, /r
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 
@@ -24,6 +25,10 @@ import itertools
 import time
 import json
 from proxywrap import GimmeProxyAPI
+from mwt import MWT
+import os
+import sys
+from threading import Thread
 
 REF_TAG_VALUE="&tag=luckyflo95-21"
 
@@ -73,8 +78,7 @@ def search(update, context):
 
     #Build Amazon search link.
     AMZN = "https://www.amazon.it/s?k="
-    #REF = "tag=luckyflo95-21"
-    url = AMZN + keyword #+ "&" + REF
+    url = AMZN + keyword
     # Setting a header to trick Amazon. This way it will think that the scraper is a legit user.
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36'
@@ -109,6 +113,12 @@ def search(update, context):
     
     #Returned message.
     update.message.reply_text(response, link_preview=True)
+
+# Method for getting admin ids. Useful to allow the performing of specific commands.
+@MWT(timeout=60*60)
+def get_admin_ids(bot, chat_id):
+    """Returns a list of admin IDs for a given chat. Results are cached for 1 hour."""
+    return [admin.user.id for admin in bot.get_chat_administrators(chat_id)]
     
 
 #Main function.
@@ -122,16 +132,31 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
+    # Stop current instance of the program and start a new one in a new process.
+    def stop_and_restart():
+        """Gracefully stop the Updater and replace the current process with a new one"""
+        updater.stop()
+        os.execl(sys.executable, sys.executable, *sys.argv)
+
+    # Check if user requesting is an admin and perform the thread restart.
+    def restart(update, context):
+        if update.effective_user.id in get_admin_ids(context.bot, update.message.chat_id):
+            update.message.reply_text('Admin request detected: bot will restart now...')
+            Thread(target=stop_and_restart).start()
+
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help_command))
 
-    # on noncommand i.e cerca - search for Amazon results and return links.
+    # on command i.e cerca - search for Amazon results and return links.
     dp.add_handler(CommandHandler("cerca", search))
     dp.add_handler(CommandHandler("search", search))
 
-    # on noncommand i.e refresh - change bot ip so it doesn't get banned
+    # on command i.e refresh - change bot ip so it doesn't get banned
     dp.add_handler(CommandHandler("refresh", refresh))
+
+    # on command i.e. r - restart the bot. Should only be performed by admins.
+    dp.add_handler(CommandHandler('r', restart))
 
     # Start the Bot
     updater.start_polling()
