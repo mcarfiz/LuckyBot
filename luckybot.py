@@ -42,6 +42,7 @@ def help_command(update, context):
     update.message.reply_text('Lista dei comandi supportati:\n\n/cerca: trova i migliori prodotti di Amazon consigliati da LuckyFlo.')
 
 # Setting proxy with a GimmeProxy wrapper.
+# This is a debug command and shouldn't be used by common users.
 def refresh(update,context):
     try:
         proxy = GimmeProxyAPI(country="IT,UK")
@@ -50,7 +51,7 @@ def refresh(update,context):
         update.message.reply_text("I nostri server proxy non rispondono al momento :(")
 
 # /search command. The command makes an Amazon.it research using the passed keywords
-# and returns some links as of version 1.0.
+# and returns some links with pricess as of version 0.2.
 def search(update, context):
     """Search for Amazon product and return it. Need to issue /cerca keywords."""
 
@@ -90,17 +91,17 @@ def search(update, context):
     #Adding links to the response. Product_url var contains the link of a single product and will be used to scrap product information.
     for index, a in zip(range(4), links):
         product_url = "https://amazon.it" + a['href']
-        '''debug print''' 
-        update.message.reply_text(product_url + " HO FATTO URL N*" + str(index+1))
+        '''debug print
+        update.message.reply_text(product_url + " HO FATTO URL N*" + str(index+1))''' 
         #Preparing the soup for single product scraping. (Price and name)
         s = requests.get(product_url, headers = headers)
         prodsoup = BeautifulSoup(s.content, "lxml")
         #debug print# update.message.reply_text("scrappato URL N*"+ str(index+1))
         price = prodsoup.find_all('span', {'class': 'a-size-medium a-color-price'})
         name = prodsoup.find_all('span', {'id': 'productTitle'})
-        '''debug print''' 
-        update.message.reply_text(name[0].get_text() + " prezzo: " + price[0].get_text())
-        response += "["+ str(index+1) + ". " + name[0].get_text() +"](" + product_url + ") " + "Prezzo: " + price[0].get_text() + "\n\n"
+        '''debug print
+        update.message.reply_text(name[0].get_text() + " prezzo: " + price[0].get_text())''' 
+        response += "["+ str(index+1) + ". " + name[0].get_text().strip() +"](" + product_url + ") " + "Prezzo: " + price[0].get_text() + "\n\n"
     
     #Returned message.
     update.message.reply_text(response, link_preview=True)

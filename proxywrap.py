@@ -1,3 +1,6 @@
+''' Thanks to the chad https://github.com/DeyaaMuhammad/GimmeProxyApi
+	for this library'''
+
 import json
 import requests
 
@@ -25,6 +28,8 @@ class GimmeProxyAPI(object):
 
 		if request.status_code == 200:
 			self.response = request.json()
+		elif request.status_code == 429:
+			raise Exception("Too many requests! Try to cool down a bit.")
 		else:
 			raise Exception("An unknown error occured, status_code = {}".format(request.status_code))
 
