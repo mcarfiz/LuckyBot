@@ -11,7 +11,7 @@ Code documentation is in english anyway.
 
 ## Functions
 Current supported functions:
-- **/cerca** researches some keywords and return the first five results of an Amazon.it search.
+- **/search** researches some keywords and return the first five results of an Amazon.it search.
 
 
 ## What is needed to run the bot (Ubuntu/PIP)
