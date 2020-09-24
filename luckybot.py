@@ -102,7 +102,7 @@ def search(update, context):
     links = soup.find_all('a', {'class': 'a-link-normal s-no-outline'}, href=True)
 
     # Just a confirmation for the user.
-    update.message.reply_text("La tua richiesta per \"" + suppkey + "\" è stata ricevuta. \nAttendi qualche secondo affinché venga processata.")
+    update.message.reply_text("La tua richiesta per \"" + suppkey.strip() + "\" è stata ricevuta. \nAttendi qualche secondo affinché venga processata.")
 
     # Setting response message.
     response = "Per la tua ricerca su" + suppkey + " ho trovato i seguenti link:\n ----------------------\n\n\n"
@@ -160,7 +160,9 @@ def main():
     # Stop current instance of the program and start a new one in a new process.
     def stop_and_restart():
         """Gracefully stop the Updater and replace the current process with a new one"""
+        print("Stopping bot.")
         updater.stop()
+        print("Bot is now restarting.")
         os.execl(sys.executable, sys.executable, *sys.argv)
 
     # Check if user requesting is an admin and perform the thread restart.
@@ -168,6 +170,8 @@ def main():
         if update.effective_user.id in get_admin_ids(context.bot, update.message.chat_id):
             update.message.reply_text('Admin request detected: bot will restart now...')
             Thread(target=stop_and_restart).start()
+        else:
+            update.message.reply_text('Admin NOT detected.')
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
