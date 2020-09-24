@@ -87,8 +87,9 @@ def search(update, context):
         suppkey += " " + word
 
     # Build Amazon search link.
-    AMZN = "https://www.amazon.it/s?k="
-    url = AMZN + keyword
+    amzn = "https://www.amazon.it/s?k={}"
+    url = amzn.format(keyword)
+
     # Setting a header to trick Amazon. This way it will think that the scraper is a legit user.
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36'
@@ -102,10 +103,10 @@ def search(update, context):
     links = soup.find_all('a', {'class': 'a-link-normal s-no-outline'}, href=True)
 
     # Just a confirmation for the user.
-    update.message.reply_text("La tua richiesta per \"" + suppkey.strip() + "\" è stata ricevuta. \nAttendi qualche secondo affinché venga processata.")
+    update.message.reply_text("La tua richiesta per \"{}\" è stata ricevuta. \nAttendi qualche secondo affinché venga processata.".format(suppkey.strip()))
 
     # Setting response message.
-    response = "Per la tua ricerca su" + suppkey + " ho trovato i seguenti link:\n ----------------------\n\n\n"
+    response = "Per la tua ricerca su \"{}\" ho trovato i seguenti link:\n ----------------------\n\n\n".format(suppkey.strip())
     # Adding links to the response. Product_url var contains the link of a single product and will be used to scrap product information.
     for index, a in zip(range(4), links):
         product_url = "https://amazon.it" + a['href']
@@ -118,7 +119,7 @@ def search(update, context):
         name = prodsoup.find_all('span', {'id': 'productTitle'})
         '''debug print
         update.message.reply_text(name[0].get_text() + " prezzo: " + price[0].get_text())''' 
-        response += "["+ str(index+1) + ". " + name[0].get_text().strip() +"](" + product_url + REF_TAG_VALUE + ") " + "Prezzo: " + price[0].get_text() + "\n\n"
+        response += "["+ str(index+1) + ". {} ]({}{}) Prezzo: {}\n\n".format(name[0].get_text().strip(), product_url, REF_TAG_VALUE, price[0].get_text())
     
     # Returned message.
     update.message.reply_text(response, link_preview=True)
@@ -152,7 +153,8 @@ def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater("1355056584:AAFs2ZlWL3xOKjLVssEw-5VtGPM5-EvWEI0", use_context=True)
+    TOKEN = "1355056584:AAFs2ZlWL3xOKjLVssEw-5VtGPM5-EvWEI0"
+    updater = Updater(TOKEN, use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
