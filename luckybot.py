@@ -14,7 +14,7 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 
 $ref = 'luckyflo95-21';
-http://www.amazon.com/dp/ASIN/?&tag=luckyflo95-21
+http://www.amazon.com/dp/ASIN/?tag=luckyflo95-21
 """
 
 import logging
@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
     """Send a message when the command /start is issued."""
-    update.message.reply_text('Attivazione di LuckyFloBot V. 0.2 \nUn secondo di pazienza, grazie.')
+    update.message.reply_text('Attivazione di LuckyFloBot\nUn secondo di pazienza, grazie.')
     time.sleep(1.5)
     update.message.reply_text('Ciao bello! Scrivi /help per conoscere cosa posso fare!')
 
@@ -87,8 +87,8 @@ def search(update, context):
         suppkey += " " + word
 
     # Build Amazon search link.
-    amzn = "https://www.amazon.it/s?k={}"
-    url = amzn.format(keyword)
+    amzn = "https://www.amazon.it/s?k={}{}"
+    url = amzn.format(keyword, REF_TAG_VALUE)
 
     # Setting a header to trick Amazon. This way it will think that the scraper is a legit user.
     headers = {
