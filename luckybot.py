@@ -19,6 +19,7 @@ http://www.amazon.com/dp/ASIN/?tag=luckyflo95-21
 
 import logging
 from telegram.ext import Updater, CommandHandler, MessageHandler
+from telegram import ParseMode
 from bs4 import BeautifulSoup
 import requests
 import itertools
@@ -106,7 +107,7 @@ def search(update, context):
     update.message.reply_text("La tua richiesta per \"{}\" è stata ricevuta. \nAttendi qualche secondo affinché venga processata.".format(suppkey.strip()))
 
     # Setting response message.
-    response = "Per la tua ricerca su \"{}\" ho trovato i seguenti link:\n ----------------------\n\n\n".format(suppkey.strip())
+    response = "Per la tua ricerca su \"{}\" ho trovato i seguenti link:\n\n\n".format(suppkey.strip())
     # Adding links to the response. Product_url var contains the link of a single product and will be used to scrap product information.
     for index, a in zip(range(4), links):
         product_url = "https://amazon.it" + a['href']
@@ -119,10 +120,10 @@ def search(update, context):
         name = prodsoup.find_all('span', {'id': 'productTitle'})
         '''debug print
         update.message.reply_text(name[0].get_text() + " prezzo: " + price[0].get_text())''' 
-        response += "["+ str(index+1) + ". {} ]({}{}) Prezzo: {}\n\n".format(name[0].get_text().strip(), product_url, REF_TAG_VALUE, price[0].get_text())
+        response += str(index+1) + ".   [{}]({}) \nPrezzo: {}\n\n".format(name[0].get_text().strip(), product_url, price[0].get_text())
     
-    # Returned message.
-    update.message.reply_text(response, link_preview=True)
+    # Returned message. Parsed as markdown to enable hypertext links visualization.
+    update.message.reply_text(response, parse_mode=ParseMode.MARKDOWN, link_preview=True, disable_web_page_preview=False)
 
 # Method for getting admin ids. Useful to allow the performing of specific commands.
 @MWT(timeout=60*60)
