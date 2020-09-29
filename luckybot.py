@@ -139,7 +139,7 @@ def link (update, context):
     link    = context.args
     reflink = link , "&", REF_TAG_VALUE
     
-    response = "Ecco il referal link: ", format(reflink, [])
+    response = "Ecco il referal link: ", format(reflink)
     print (link)
     print (response)
     
