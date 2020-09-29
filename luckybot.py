@@ -132,7 +132,7 @@ def link (update, context):
         update.message.reply_text("Prova ad aggiungere il link da trasformare dopo il comando /link :)")
         return
         
-    link    = context.args.strip
+    link    = context.args.reply_text
     reflink = link + "&" + REF_TAG_VALUE
 
  
