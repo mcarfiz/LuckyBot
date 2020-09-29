@@ -50,7 +50,7 @@ def start(update, context):
 
 def help_command(update, context):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Lista dei comandi supportati:\n\n/cerca: trova i migliori prodotti di Amazon consigliati da LuckyFlo.')
+    update.message.reply_text('Lista dei comandi supportati:\n\n/cerca: trova i migliori prodotti di Amazon consigliati da LuckyFlo.\n/link: manda un link di amazon.it per aggiungere il ref.')
 
 def support_command(update, context):
     """Send a message when the command /support is issued."""
@@ -125,18 +125,22 @@ def search(update, context):
     # Returned message. Parsed as markdown to enable hypertext links visualization.
     update.message.reply_text(response, parse_mode=ParseMode.MARKDOWN, link_preview=True, disable_web_page_preview=False)
     
+# /link command, adds referral to an amazon link
 def link (update, context):
     """Convert  Amazon link in to Referal Amazon Link. Need to issue /link and post link."""
     # Checking that arguments are present.
     if (not context.args):
         update.message.reply_text("Prova ad aggiungere il link da trasformare dopo il comando /link :)")
         return
-        
-    # Saving first argument and building reflink.
+
     link = context.args[0]
-    reflink = link + REF_TAG_VALUE
-    
-    response = "[Clicca qui per il tuo link refererral.]({})".format(reflink)
+    if ("amazon.it" in link):    
+        # Saving first argument and building reflink.
+        reflink = link + REF_TAG_VALUE   
+        response = "[Clicca qui per il tuo link referral.]({})".format(reflink)
+    else:
+        update.message.reply_text("Manda un link di amazon.it!")
+        return
     # print(link)
     # print(response)
     
