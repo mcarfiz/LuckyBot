@@ -9,7 +9,7 @@ First, a few handler functions are defined. Then, those functions are passed to
 the Dispatcher and registered at their respective places.
 Then, the bot is started and runs until we press Ctrl-C on the command line.
 Commands list:
-/start, /help, /search, /refresh, /r, /support, /status
+/start, /help, /search, /link, /refresh, /r, /support, /status 
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 
@@ -124,6 +124,27 @@ def search(update, context):
     
     # Returned message. Parsed as markdown to enable hypertext links visualization.
     update.message.reply_text(response, parse_mode=ParseMode.MARKDOWN, link_preview=True, disable_web_page_preview=False)
+    
+def link (update, context):
+    """Convert  Amazon link in to Referal Amazon Link. Need to issue /link and post link."""
+    # Saving user-link and .
+    link    = context.args
+    reflink = link + "&" + REF_TAG_VALUE
+    
+    if (not context.args):
+        update.message.reply_text("Prova ad aggiungere il link da trasformare dopo il comando /link :)")
+        return
+
+    # Check if target site is reachable.
+    if not check_net():
+        update.message.reply_text("Target site is not responding! Try /support to seek help.")
+        return
+
+
+    # Setting response message.
+    response = "Ecco il link referal:\n\n\n".format(reflink.strip())
+    
+ 
 
 # Method for getting admin ids. Useful to allow the performing of specific commands.
 @MWT(timeout=60*60)
@@ -180,9 +201,12 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help_command))
 
-    # on command i.e cerca - search for Amazon results and return links.
+   
     dp.add_handler(CommandHandler("cerca", search))
     dp.add_handler(CommandHandler("search", search))
+    
+    # on command i.e cerca - link Amazon  return referal Amazon link.
+    dp.add_handler(CommandHandler("link", link))
 
     # on command i.e refresh - change bot ip so it doesn't get banned
     dp.add_handler(CommandHandler("refresh", refresh))
