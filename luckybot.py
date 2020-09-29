@@ -130,7 +130,12 @@ def link (update, context):
     # Saving user-link and .
     if (not context.args):
         update.message.reply_text("Prova ad aggiungere il link da trasformare dopo il comando /link :)")
+        
         return
+    else     
+            link    = context
+            reflink = link , "&", REF_TAG_VALUE
+
         
     link    = context
     reflink = link , "&", REF_TAG_VALUE
@@ -142,9 +147,8 @@ def link (update, context):
         return
 
 
-    # Setting response message.
-    if context.args <> ""
-    update.message.reply_text("Ecco il link referal:\n\n\n",reflink)
+  
+   
     
  
 
