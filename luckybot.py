@@ -128,23 +128,28 @@ def search(update, context):
 def link (update, context):
     """Convert  Amazon link in to Referal Amazon Link. Need to issue /link and post link."""
     # Saving user-link and .
-    if (not context):
+    if (not context.args):
         update.message.reply_text("Prova ad aggiungere il link da trasformare dopo il comando /link :)")
+        
         return
-   
-
-    if context != "" :
-        link    = context
-        reflink = link , "&", REF_TAG_VALUE
-        update.message.reply_text("Ecco : ", reflink)
-        return
+        
+    if not check_net():
+        update.message.reply_text("Target site is not responding! Try /support to seek help.")
+           
+     return
+        
+    link    = context.args
+    reflink = link , "&", REF_TAG_VALUE
+    
+    response = "Ecco il referal link:\n\n\n".format(reflink)
+    
+    # Returned message. Parsed as markdown to enable hypertext links visualization.
+    update.message.reply_text(response, parse_mode=ParseMode.MARKDOWN, link_preview=True, disable_web_page_preview=False)
     
 
  
     # Check if target site is reachable.
-    if not check_net():
-        update.message.reply_text("Target site is not responding! Try /support to seek help.")
-        return
+   
 
 
   
