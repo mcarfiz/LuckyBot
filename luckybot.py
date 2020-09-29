@@ -31,6 +31,7 @@ import os
 import sys
 from threading import Thread
 import urllib.request
+import re
 
 REF_TAG_VALUE="&tag=luckyflo95-21"
 
@@ -133,16 +134,20 @@ def link (update, context):
         update.message.reply_text("Prova ad aggiungere il link da trasformare dopo il comando /link :)")
         return
 
+    # Building the regex to check amazon.it links. Try it here https://regex101.com/r/6KJoTJ/3
+    amzn_re = "https?:\/\/(www)?amazon\.+it\/(((?:(?:dp|gp)\/([A-Z0-9]+))?\S*[?&]?(?:tag=))?\S*?)(?:#)?(\w*?-\w{2})?(\S*)(#?\S*)+"
+    
+    # Saving first argument and building reflink.
     link = context.args[0]
-    if ("amazon.it" in link):    
-        # Saving first argument and building reflink.
+
+    # Check if regex matches.
+    if (re.search(amzn_re, link)):    
+        # if ok, build reflink and send it.
         reflink = link + REF_TAG_VALUE   
         response = "[Clicca qui per il tuo link referral.]({})".format(reflink)
     else:
         update.message.reply_text("Manda un link di amazon.it!")
         return
-    # print(link)
-    # print(response)
     
     # Returned message. Parsed as markdown to enable hypertext links visualization.
     update.message.reply_text(response, parse_mode=ParseMode.MARKDOWN, link_preview=True, disable_web_page_preview=False)
