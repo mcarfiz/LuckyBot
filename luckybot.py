@@ -133,7 +133,7 @@ def link (update, context):
         return
    
 
-    if (is context)
+    if (context)
         link    = context
         reflink = link , "&", REF_TAG_VALUE
         update.message.reply_text("Ecco : ", reflink)
