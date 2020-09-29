@@ -128,17 +128,16 @@ def search(update, context):
 def link (update, context):
     """Convert  Amazon link in to Referal Amazon Link. Need to issue /link and post link."""
     # Saving user-link and .
-    if (not context.args):
+    if (not context):
         update.message.reply_text("Prova ad aggiungere il link da trasformare dopo il comando /link :)")
-         else     
-            link    = context
-            reflink = link , "&", REF_TAG_VALUE
         return
    
 
-        
-    link    = context
-    reflink = link , "&", REF_TAG_VALUE
+    if (is context)
+        link    = context
+        reflink = link , "&", REF_TAG_VALUE
+        update.message.reply_text("Ecco : ", reflink)
+    
 
  
     # Check if target site is reachable.
