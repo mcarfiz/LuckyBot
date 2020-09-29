@@ -137,6 +137,7 @@ def link (update, context):
         link    = context
         reflink = link , "&", REF_TAG_VALUE
         update.message.reply_text("Ecco : ", reflink)
+        return
     
 
  
