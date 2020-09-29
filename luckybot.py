@@ -140,8 +140,9 @@ def link (update, context):
     reflink = link , "&", REF_TAG_VALUE
     
     response = "Ecco il referal link:\n\n\n".format(reflink)
+    print (response)
     # Returned message. Parsed as markdown to enable hypertext links visualization.
-    update.message.reply_text(response)
+    update.message.reply_text(response, parse_mode=ParseMode.MARKDOWN, link_preview=True, disable_web_page_preview=False)
     
 
  
