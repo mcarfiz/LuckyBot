@@ -131,13 +131,15 @@ def link (update, context):
     if (not context.args):
         update.message.reply_text("Prova ad aggiungere il link da trasformare dopo il comando /link :)")
         return
-
+        
+    link    = context.args
+    reflink = link + "&" + REF_TAG_VALUE
+    print reflink
+ 
     # Check if target site is reachable.
     if not check_net():
         update.message.reply_text("Target site is not responding! Try /support to seek help.")
         return
-    link    = context.args
-    reflink = link + "&" + REF_TAG_VALUE
 
 
     # Setting response message.
