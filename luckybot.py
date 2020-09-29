@@ -134,7 +134,7 @@ def link (update, context):
         
     link    = context.args
     reflink = link + "&" + REF_TAG_VALUE
-    print reflink
+    print (reflink)
  
     # Check if target site is reachable.
     if not check_net():
