@@ -130,11 +130,11 @@ def link (update, context):
     # Saving user-link and .
     if (not context.args):
         update.message.reply_text("Prova ad aggiungere il link da trasformare dopo il comando /link :)")
-        
-        return
-    else     
+         else     
             link    = context
             reflink = link , "&", REF_TAG_VALUE
+        return
+   
 
         
     link    = context
