@@ -133,7 +133,7 @@ def link (update, context):
         return
         
     link    = context
-    reflink = link + "&" + REF_TAG_VALUE
+    reflink = link , "&", REF_TAG_VALUE
 
  
     # Check if target site is reachable.
