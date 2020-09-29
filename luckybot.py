@@ -143,7 +143,7 @@ def link (update, context):
 
 
     # Setting response message.
-    response = "Ecco il link referal:\n\n\n".format(reflink.strip())
+    response = "Ecco il link referal:\n\n\n".format(reflink)
     
  
 
