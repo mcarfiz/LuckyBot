@@ -143,7 +143,7 @@ def link (update, context):
 
 
     # Setting response message.
-    response = "Ecco il link referal:\n\n\n".format(reflink)
+    response = update.message.reply_text("Ecco il link referal:\n\n\n",reflink)
     
  
 
