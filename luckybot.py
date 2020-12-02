@@ -12,9 +12,7 @@ Commands list:
 /start, /help, /search, /link, /refresh, /r, /support, /status 
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
-
-$ref = 'luckyflo95-21';
-http://www.amazon.com/dp/ASIN/?tag=luckyflo95-21
+Set the TOKEN value in the main and the REF_TAG_VALUE value at the beginning (latter is needed only if you want the amazon ref features)
 """
 
 import logging
@@ -33,7 +31,8 @@ from threading import Thread
 import urllib.request
 import re
 
-REF_TAG_VALUE="&tag=luckyflo95-21"
+# Insert here in the XXX the value of the Amazon ref tag
+REF_TAG_VALUE="&tag=XXX"
 
 # Enable logging.
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -72,7 +71,7 @@ def search(update, context):
     """Search for Amazon product and return it. Need to issue /cerca keywords."""
 
     # Initial nullness check for keywords. If no keyword is passed it's not worth to perform the scrap.
-    if (not context.args):
+    if not context.args:
         update.message.reply_text("Prova ad aggiungere qualche parola da cercare dopo il comando /cerca :)")
         return
 
@@ -181,7 +180,7 @@ def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    TOKEN = "1355056584:AAFs2ZlWL3xOKjLVssEw-5VtGPM5-EvWEI0"
+    TOKEN = ""
     updater = Updater(TOKEN, use_context=True)
 
     # Get the dispatcher to register handlers
