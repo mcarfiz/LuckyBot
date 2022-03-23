@@ -1,5 +1,5 @@
 # LuckyFloBot
-Welcome to the LuckyFloBot (codename CONNOR) repository.
+Welcome to the LuckyFloBot repository.
 
 LuckyFloBot is Telegram bot written in Python 3.
 
@@ -28,5 +28,3 @@ Current supported functions:
 
 ### For MacOS refer to *brew* for pip installation
 [Brew page for Python3](https://docs.brew.sh/Homebrew-and-Python#python-3x)
-
-**Project is open-source: still, since it contains our private token it will not be public from day one.**
